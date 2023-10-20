@@ -21,6 +21,7 @@ class GanttChart
 {
 public:
     int process_id,start_time,finish_time;
+    string schedule;
 };
 
 //Varibale, Object and Vector declaration
@@ -39,7 +40,7 @@ void readFileProcess()
     int i=0;
     ifstream readFile("Input.txt");
     getline(readFile,tempLine);
-    cout<<tempLine<<"\n";
+    // cout<<tempLine<<"\n";
     while(readFile>>processObject.name>>processObject.arrival_time>>processObject.burst_time>>processObject.queue)
     {
         processObject.finished= false;
@@ -89,16 +90,16 @@ void ganttChart()
 {
     ofstream writeFile("Output.txt", ios::app);
     cout<<"\n\t------Gantt Chart--------\n\n";
-    cout<<"Name\tST\tFT\n";
+    cout<<"Name\tQueue\tST\tFT\n";
     //write into file
     writeFile<<"\n\t------Gantt Chart--------\n\n";
-    writeFile<<"Sl\tName\tST\tFT\n";
+    writeFile<<"Sl\tName\tQueue\tST\tFT\n";
     int length= chart.size();
     for(int i=0; i<length; i++)
     {
-        cout<<i+1<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
+        cout<<i+1<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].schedule<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
         //write into file
-        writeFile<<i+1<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
+        writeFile<<i+1<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].schedule<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
     }
     writeFile.close();
 }
@@ -113,10 +114,10 @@ void performance()
     writeFile<<"Name\tAT\tBT\tQueue\tTAT\tWT\tRT\tTotalTime\n";
     for(int id=0; id<n; id++)
     {
-        cout<<process[id].name<<"\t"<<process[id].arrival_time<<"\t"<<process[id].burst_time<<"\t"<<process[id].queue;
+        cout<<process[id].name<<"\t"<<process[id].arrival_time<<"\t"<<process[id].service_time<<"\t"<<process[id].queue;
         cout<<"\t"<<process[id].turn_around_time<<"\t"<<process[id].waiting_time<<"\t"<<process[id].response_time<<"\t"<<totalTime<<"\n";
         //write into file
-        writeFile<<process[id].name<<"\t"<<process[id].arrival_time<<"\t"<<process[id].burst_time<<"\t"<<process[id].queue;
+        writeFile<<process[id].name<<"\t"<<process[id].arrival_time<<"\t"<<process[id].service_time<<"\t"<<process[id].queue;
         writeFile<<"\t"<<process[id].turn_around_time<<"\t"<<process[id].waiting_time<<"\t"<<process[id].response_time<<"\t"<<totalTime<<"\n";
         totalWait+= process[id].waiting_time;
         totalResponse+= process[id].response_time;
@@ -153,6 +154,7 @@ int processArrived(int id)
 }
 int roundRobin(int pid)
 {
+    // cout<<"\nRound Robin\n";
     countProcess=0;
     while(!queue1.empty() && countProcess<queue1.size())
     {
@@ -164,9 +166,12 @@ int roundRobin(int pid)
             }
             chartObjet.process_id= queue1[countProcess];
             chartObjet.start_time= totalTime;
+            // cout<<chartObjet.process_id<<"\t"<<chartObjet.start_time<<"\n";
             totalTime+= quantum;
             chartObjet.finish_time= totalTime;
+            chartObjet.schedule= "RR";
             chart.push(chartObjet);
+            // cout<<chartObjet.process_id<<"\t"<<chartObjet.finish_time<<"\n";
             // cout<<"\n\t\t"<<chartObjet.process_id<<"\n";
             process[queue1[countProcess]].burst_time-=quantum;
             if(process[queue1[countProcess]].burst_time ==0 )
@@ -185,9 +190,12 @@ int roundRobin(int pid)
             }
             chartObjet.process_id= queue1[countProcess];
             chartObjet.start_time= totalTime;
+            // cout<<chartObjet.process_id<<"\t"<<chartObjet.start_time<<"\n";
             totalTime+= process[queue1[countProcess]].burst_time;
             chartObjet.finish_time= totalTime;
+            chartObjet.schedule= "RR";
             chart.push(chartObjet);
+            // cout<<chartObjet.process_id<<"\t"<<chartObjet.finish_time<<"\n";
             // cout<<"\n\t\t"<<chartObjet.process_id<<"\n";
             process[queue1[countProcess]].burst_time=0;
             process[queue1[countProcess]].turn_around_time= totalTime - process[queue1[countProcess]].arrival_time;
@@ -212,8 +220,10 @@ int roundRobin(int pid)
 }
 int firstComeFisrtServe(int pid)
 {
+    // cout<<"\nFCFS\n";
     chartObjet.process_id= pid;
     chartObjet.start_time= totalTime;
+    // cout<<chartObjet.process_id<<"\t"<<chartObjet.start_time<<"\n";
     process[pid].response_time= totalTime - process[pid].arrival_time;
     int currentTime = totalTime , temp= 10;
     totalTime+= process[pid].burst_time;
@@ -222,24 +232,31 @@ int firstComeFisrtServe(int pid)
     {
         totalTime = process[needRoundRobinId].arrival_time;
         chartObjet.finish_time= totalTime;
+        chartObjet.schedule= "FCFS";
         chart.push(chartObjet);
+        // cout<<chartObjet.process_id<<"\t"<<chartObjet.finish_time<<"\n";
         // cout<<"\n\t\t"<<chartObjet.process_id<<"\n";
         process[pid].burst_time-= totalTime-currentTime;
         // cout<<"\n-----FCFS1-----\n";
         temp= roundRobin(needRoundRobinId);
         chartObjet.process_id= pid;
         chartObjet.start_time= totalTime;
+        cout<<chartObjet.process_id<<"\t"<<chartObjet.start_time<<"\n";
         totalTime+= process[pid].burst_time;
         process[pid].burst_time=0;
         chartObjet.finish_time= totalTime;
+        chartObjet.schedule= "FCFS";
         chart.push(chartObjet);
+        // cout<<chartObjet.process_id<<"\t"<<chartObjet.finish_time<<"\n";
         // cout<<"\n\t\t"<<chartObjet.process_id<<"\n";
         // cout<<"\n\t\t"<<temp<<"\n";
     }
     if(process[pid].burst_time!=0)
     {
         chartObjet.finish_time= totalTime;
+        chartObjet.schedule= "FCFS";
         chart.push(chartObjet);
+        // cout<<chartObjet.process_id<<"\t"<<chartObjet.finish_time<<"\n";
     }
     process[pid].turn_around_time= totalTime - process[pid].arrival_time;
     process[pid].burst_time=0;
