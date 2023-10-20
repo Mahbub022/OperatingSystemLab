@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <iomanip>
 
 using namespace std;
 #define push push_back
@@ -36,10 +37,10 @@ GanttChart chartObjet;
 void readFileProcess()
 {
     int i=0;
-    ifstream readFile("input.txt");
+    ifstream readFile("Input.txt");
     getline(readFile,tempLine);
     cout<<tempLine<<"\n";
-    while(i<n && readFile>>processObject.name>>processObject.arrival_time>>processObject.burst_time>>processObject.queue)
+    while(readFile>>processObject.name>>processObject.arrival_time>>processObject.burst_time>>processObject.queue)
     {
         processObject.finished= false;
         processObject.turn_around_time= 0;
@@ -47,19 +48,25 @@ void readFileProcess()
         processObject.response_time= -1;
         processObject.service_time= processObject.burst_time;
         process.push(processObject);
-        cout<<process[i].name<<"\t"<<process[i].arrival_time<<"\t"<<process[i].burst_time<<"\t"<<process[i].queue<<"\t"<<"\n";
-        i++;
+        // cout<<process[i].name<<"\t"<<process[i].arrival_time<<"\t"<<process[i].burst_time<<"\t"<<process[i].queue<<"\t"<<"\n";
+        // i++;
     }
     readFile.close();
     n= process.size();
 }
 void processDetails()
 {
+    ofstream writeFile("Output.txt", ios::app);
     cout<<tempLine<<"\n"; 
+    //write into file
+    writeFile<<tempLine<<"\n";
     for(int id=0;id<n;id++)
     {
         cout<<process[id].name<<"\t"<<process[id].arrival_time<<"\t"<<process[id].burst_time<<"\t"<<process[id].queue<<"\n";
+        //write into file
+        writeFile<<process[id].name<<"\t"<<process[id].arrival_time<<"\t"<<process[id].burst_time<<"\t"<<process[id].queue<<"\n";
     }
+    writeFile.close();
 }
 
 // bool compareProcessQueue(Process p1, Process p2) 
@@ -80,33 +87,53 @@ bool compareProcessTime(Process p1, Process p2)
 
 void ganttChart()
 {
+    ofstream writeFile("Output.txt", ios::app);
     cout<<"\n\t------Gantt Chart--------\n\n";
-    // cout<<"Name\tST\tFT\n";
+    cout<<"Name\tST\tFT\n";
+    //write into file
+    writeFile<<"\n\t------Gantt Chart--------\n\n";
+    writeFile<<"Sl\tName\tST\tFT\n";
     int length= chart.size();
     for(int i=0; i<length; i++)
     {
-        cout<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
+        cout<<i+1<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
+        //write into file
+        writeFile<<i+1<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
     }
-    cout<<"\t\t"<<length<<"\t\t";
+    writeFile.close();
 }
 void performance()
 {
+    ofstream writeFile("Output.txt", ios::app);
     int totalWait= 0, totalResponse= 0, totalService= 0; 
     cout<<"\n\t------Performance-------\n\n";
     cout<<"Name\tAT\tBT\tQueue\tTAT\tWT\tRT\tTotalTime\n";
+    //write into file
+    writeFile<<"\n\t------Performance-------\n\n";
+    writeFile<<"Name\tAT\tBT\tQueue\tTAT\tWT\tRT\tTotalTime\n";
     for(int id=0; id<n; id++)
     {
         cout<<process[id].name<<"\t"<<process[id].arrival_time<<"\t"<<process[id].burst_time<<"\t"<<process[id].queue;
         cout<<"\t"<<process[id].turn_around_time<<"\t"<<process[id].waiting_time<<"\t"<<process[id].response_time<<"\t"<<totalTime<<"\n";
+        //write into file
+        writeFile<<process[id].name<<"\t"<<process[id].arrival_time<<"\t"<<process[id].burst_time<<"\t"<<process[id].queue;
+        writeFile<<"\t"<<process[id].turn_around_time<<"\t"<<process[id].waiting_time<<"\t"<<process[id].response_time<<"\t"<<totalTime<<"\n";
         totalWait+= process[id].waiting_time;
         totalResponse+= process[id].response_time;
         totalService+= process[id].turn_around_time;
     }
-    cout<<"\nCPU utilization: "<<(totalTime-idleTime)*100.00/totalTime<<" %";
-    cout<<"\nThroughput: "<<n*100.00/totalTime<<" %";
+    cout<<"\nCPU utilization: "<<fixed<<setprecision(2)<<(totalTime-idleTime)*100.00/totalTime<<" %";
+    cout<<"\nThroughput: "<<fixed<<setprecision(2)<<n*100.00/totalTime<<" %";
     cout<<"\nAvg TurnAroundTime: "<<totalService*1.00/n;
     cout<<"\nAvg WaitingTime: "<<totalWait*1.00/n;
     cout<<"\nAvg ResponseTime: "<<totalResponse*1.00/n<<"\n";
+    //write into file
+    writeFile<<"\nCPU utilization: "<<fixed<<setprecision(2)<<(totalTime-idleTime)*100.00/totalTime<<" %";
+    writeFile<<"\nThroughput: "<<fixed<<setprecision(2)<<n*100.00/totalTime<<" %";
+    writeFile<<"\nAvg TurnAroundTime: "<<totalService*1.00/n;
+    writeFile<<"\nAvg WaitingTime: "<<totalWait*1.00/n;
+    writeFile<<"\nAvg ResponseTime: "<<totalResponse*1.00/n<<"\n";
+    writeFile.close();
 }
 int processArrived(int id)
 {
@@ -219,14 +246,16 @@ int firstComeFisrtServe(int pid)
 int main()
 {
     int temp=0;
+    ofstream writeFIle("Output.txt", ios::app);
     cout<<"----Multi level Queue----"<<"\n";
+    //write into file
+    writeFIle<<"----Multi level Queue----"<<"\n";
+    writeFIle.close();
     readFileProcess();
+    processDetails();
     // sort(process.begin(), process.end(), compareProcessQueue);
     sort(process.begin(), process.end(), compareProcessTime);
-    //processDetails();
 
-    // cout<<"------Performance-------\n";
-    // cout<<"Name  burst_time  totalTime queue\n";
     for(int id=0;id<n;id++)
     {
         if(process[id].arrival_time>totalTime)
