@@ -96,9 +96,9 @@ void ganttChart()
     int length= chart.size();
     for(int i=0; i<length; i++)
     {
-        cout<<i+1<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
+        cout<<i<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
         //write into file
-        writeFile<<i+1<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
+        writeFile<<i<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
     }
     writeFile.close();
 }
@@ -146,7 +146,6 @@ int processArrived(int id)
         if(process[id].arrival_time<=totalTime && process[id].queue==1 && !process[id].finished)
         {
             queue1.push(id);
-            ++countProcess;
             return id;
         }
     }
@@ -204,6 +203,10 @@ int roundRobin(int pid)
         {
             countProcess= 0;
         }
+        else
+        {
+            countProcess+= 1;
+        }
     }
     return 1;
 }
@@ -227,16 +230,20 @@ int firstComeFisrtServe(int pid)
         chartObjet.process_id= pid;
         chartObjet.start_time= totalTime;
         totalTime+= process[pid].burst_time;
+        process[pid].burst_time=0;
         chartObjet.finish_time= totalTime;
         chart.push(chartObjet);
         // cout<<"\n\t\t"<<chartObjet.process_id<<"\n";
         // cout<<"\n\t\t"<<temp<<"\n";
     }
+    if(process[pid].burst_time!=0)
+    {
+        chartObjet.finish_time= totalTime;
+        chart.push(chartObjet);
+    }
     process[pid].turn_around_time= totalTime - process[pid].arrival_time;
     process[pid].burst_time=0;
     process[pid].finished=true;
-    chartObjet.finish_time= totalTime;
-    chart.push(chartObjet);
     // cout<<"\n\t\t"<<chartObjet.process_id<<"\n";
     // cout<<"\n-----FCFS2-----\n";
     // cout<<"\n\t\t"<<temp<<"\n";
