@@ -96,9 +96,9 @@ void ganttChart()
     int length= chart.size();
     for(int i=0; i<length; i++)
     {
-        cout<<i<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
+        cout<<i+1<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
         //write into file
-        writeFile<<i<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
+        writeFile<<i+1<<"\t"<<process[chart[i].process_id].name<<"\t"<<chart[i].start_time<<"\t"<<chart[i].finish_time<<"\n";
     }
     writeFile.close();
 }
@@ -154,7 +154,7 @@ int processArrived(int id)
 int roundRobin(int pid)
 {
     countProcess=0;
-    while(!queue1.empty())
+    while(!queue1.empty() && countProcess<queue1.size())
     {
         if(process[queue1[countProcess]].burst_time >= quantum)
         {
