@@ -1,0 +1,21 @@
+7 : 7 
+0 : 7 0 
+1 : 7 0 1 
+2 : 2 0 1 
+0 : 2 0 1 (No change)
+3 : 2 0 3 
+0 : 2 0 3 (No change)
+4 : 4 0 3 
+2 : 4 2 3 
+3 : 4 2 3 (No change)
+0 : 0 2 3 
+3 : 0 2 3 (No change)
+2 : 0 2 3 (No change)
+1 : 0 2 1 
+2 : 0 2 1 (No change)
+0 : 0 2 1 (No change)
+1 : 0 2 1 (No change)
+7 : 0 7 1 
+0 : 0 7 1 (No change)
+1 : 0 7 1 (No change)
+Page faults : 10
